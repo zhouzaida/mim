@@ -72,7 +72,7 @@ from mim.utils import (
 @click.option(
     '--local/--remote', default=True, help='Show local or remote packages.')
 @click.option(
-    '--display-width', type=int, default=80, help='The display width.')
+    '--display-width', type=int, default=150, help='The display width.')
 def cli(packages: List[str],
         configs: Optional[List[str]] = None,
         valid_config: bool = True,
@@ -87,7 +87,7 @@ def cli(packages: List[str],
         json_path: Optional[str] = None,
         to_dict: bool = False,
         local: bool = True,
-        display_width: int = 80) -> Any:
+        display_width: int = 150) -> Any:
     """Show the information of packages.
 
     \b
@@ -344,8 +344,11 @@ def convert2df(metadata: ModelIndex) -> DataFrame:
         if paper:
             if isinstance(paper, str):
                 collection_info['paper'] = paper
-            else:
+            elif isinstance(paper, (list, tuple)):
                 collection_info['paper'] = ','.join(paper)
+            elif isinstance(paper, dict):
+                collection_info['paper.url'] = paper['URL']
+                collection_info['paper.title'] = paper['Title']
 
         readme = getattr(collection, 'readme', None)
         if readme:
@@ -378,8 +381,11 @@ def convert2df(metadata: ModelIndex) -> DataFrame:
         if paper:
             if isinstance(paper, str):
                 model_info['paper'] = paper
-            else:
+            elif isinstance(paper, (list, tuple)):
                 model_info['paper'] = ','.join(paper)
+            elif isinstance(paper, dict):
+                model_info['paper.url'] = paper['URL']
+                model_info['paper.title'] = paper['Title']
 
         weight = getattr(model, 'weights', None)
         if weight:
@@ -690,7 +696,7 @@ def dump2json(dataframe: DataFrame, json_path: str) -> None:
     dataframe.to_json(json_path)
 
 
-def print_df(dataframe: DataFrame, display_width: int = 80) -> None:
+def print_df(dataframe: DataFrame, display_width: int = 150) -> None:
     """Print Dataframe into terminal."""
 
     def _max_len(dataframe):
